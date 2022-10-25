@@ -1,0 +1,38 @@
+---
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: Installing dnf
+    yum:
+      name:
+        - dnf
+    when: ansible_distribution == "CentOS"
+
+  - name: Update and upgrade remote CentOS server
+    dnf:
+      update_cache: yes
+      name:  "*"
+      state: latest
+    when: ansible_distribution == "CentOS"
+
+  - name: Update and upgrade Ubuntu
+    apt:
+      update_cache: yes
+      upgrade: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: dpkg fixing in Ubuntu
+    shell: |
+      dpkg --configure -a
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: ubuntu_server
+  become: true
+  roles:
+    - ubuntu_server
+
+- hosts: centOS_server
+  become: true
+  roles:
+    - centOS_server
